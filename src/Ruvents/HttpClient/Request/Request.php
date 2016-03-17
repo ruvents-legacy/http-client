@@ -41,7 +41,7 @@ class Request
      */
     public function __construct(Uri $uri, $data = null, array $headers = [], array $files = [])
     {
-        if (!isset($data) && !(is_array($data) || is_scalar($data))) {
+        if (isset($data) && !(is_array($data) || is_scalar($data))) {
             throw new InvalidArgumentException(
                 InvalidArgumentException::typeMsg($data, 'array or scalar')
             );
