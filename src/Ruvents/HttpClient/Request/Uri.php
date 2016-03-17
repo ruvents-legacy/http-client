@@ -52,22 +52,14 @@ class Uri
      * @param string       $host
      * @param string       $path
      * @param array|string $query
+     * @param bool         $secure
      * @return self
      */
-    public static function createHttp($host, $path = '', $query = [])
+    public static function createHttp($host, $path = '', $query = [], $secure = false)
     {
-        return new self('http', null, null, $host, 80, $path, $query, null);
-    }
+        $scheme = 'http'.($secure ? 's' : '');
 
-    /**
-     * @param string       $host
-     * @param string       $path
-     * @param array|string $query
-     * @return self
-     */
-    public static function createHttps($host, $path = '', $query = [])
-    {
-        return new self('https', null, null, $host, 443, $path, $query, null);
+        return new self($scheme, null, null, $host, null, $path, $query, null);
     }
 
     /**
