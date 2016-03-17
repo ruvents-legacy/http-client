@@ -1,5 +1,5 @@
 {
-    "name": "ruvents/httpclient",
+    "name": "ruvents/http-client",
     "license": "MIT",
     "type": "project",
     "description": "Ruvent Http Client",
