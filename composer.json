@@ -2,7 +2,7 @@
     "name": "ruvents/http-client",
     "license": "MIT",
     "type": "project",
-    "description": "Ruvent Http Client",
+    "description": "RUVENTS Http Client",
     "autoload": {
         "psr-4": { "": "src/" }
     },
