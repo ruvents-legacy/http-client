@@ -3,7 +3,7 @@
 ## Installation
 
 ```
-$ composer require ruvents/http-client:^1.0@dev
+$ composer require ruvents/http-client
 ```
 
 ## Usage
