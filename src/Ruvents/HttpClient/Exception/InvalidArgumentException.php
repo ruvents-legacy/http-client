@@ -18,7 +18,7 @@ class InvalidArgumentException extends \InvalidArgumentException
         return sprintf(
             'Invalid argument. Must be %s, %s given.',
             $expectedTypes,
-            gettype($var)
+            is_object($var) ? get_class($var) : gettype($var)
         );
     }
 

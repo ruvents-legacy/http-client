@@ -4,6 +4,7 @@ namespace Ruvents\HttpClient;
 
 use Ruvents\HttpClient\Exception\InvalidArgumentException;
 use Ruvents\HttpClient\Request\Request;
+use Ruvents\HttpClient\Request\Uri;
 use Ruvents\HttpClient\Response\Response;
 
 /**
@@ -22,11 +23,11 @@ class HttpClient
      * @throws InvalidArgumentException
      * @return Response
      */
-    public function send(Request $request, $method = self::METHOD_GET)
+    public static function send(Request $request, $method = self::METHOD_GET)
     {
-        if (!in_array($method, $this->getSupportedMethods(), true)) {
+        if (!in_array($method, self::getSupportedMethods(), true)) {
             throw new InvalidArgumentException(
-                InvalidArgumentException::haystackMsg($this->getSupportedMethods())
+                InvalidArgumentException::haystackMsg(self::getSupportedMethods())
             );
         }
 
@@ -34,12 +35,7 @@ class HttpClient
 
         switch ($method) {
             case self::METHOD_GET:
-                if (is_array($request->getData())) {
-                    $request->getUri()->addQueryParams($request->getData());
-                } else {
-                    $request->getUri()->addQueryParam('data', $request->getData());
-                }
-
+                $request->getUri()->addQueryParams($request->getDataArray());
                 break;
 
             case self::METHOD_POST:
@@ -58,7 +54,7 @@ class HttpClient
         ]);
 
         $responseRaw = curl_exec($ch);
-        $response = $this->createResponse($ch, $responseRaw);
+        $response = self::createResponse($ch, $responseRaw);
 
         curl_close($ch);
 
@@ -66,27 +62,44 @@ class HttpClient
     }
 
     /**
-     * @param Request $request
+     * @param Request|Uri|string $requestOrUri
+     * @param null|string|array  $data
+     * @param string[]           $headers
      * @return Response
      */
-    public function get(Request $request)
+    public static function get($requestOrUri, $data = null, array $headers = [])
     {
-        return $this->send($request, self::METHOD_GET);
+        if ($requestOrUri instanceof Request) {
+            $request = $requestOrUri;
+        } else {
+            $request = new Request($requestOrUri, $data, $headers);
+        }
+
+        return self::send($request, self::METHOD_GET);
     }
 
     /**
-     * @param Request $request
+     * @param Request|Uri|string $requestOrUri
+     * @param null|string|array  $data
+     * @param string[]           $headers
+     * @param array              $files
      * @return Response
      */
-    public function post(Request $request)
+    public static function post($requestOrUri, $data = null, array $headers = [], array $files = [])
     {
-        return $this->send($request, self::METHOD_POST);
+        if ($requestOrUri instanceof Request) {
+            $request = $requestOrUri;
+        } else {
+            $request = new Request($requestOrUri, $data, $headers, $files);
+        }
+
+        return self::send($request, self::METHOD_POST);
     }
 
     /**
      * @return array
      */
-    public function getSupportedMethods()
+    public static function getSupportedMethods()
     {
         return [
             self::METHOD_GET,
@@ -99,13 +112,13 @@ class HttpClient
      * @param string   $raw
      * @return Response
      */
-    protected function createResponse($ch, $raw)
+    protected static function createResponse($ch, $raw)
     {
         $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $rawHeaders = substr($raw, 0, $headerSize);
         $rawBody = substr($raw, $headerSize);
         $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $headers = $this->parseRawHeaders($rawHeaders);
+        $headers = self::parseRawHeaders($rawHeaders);
 
         return new Response($rawBody, $code, $headers);
     }
@@ -114,7 +127,7 @@ class HttpClient
      * @param string $raw
      * @return array
      */
-    private function parseRawHeaders($raw)
+    private static function parseRawHeaders($raw)
     {
         $headers = [];
 

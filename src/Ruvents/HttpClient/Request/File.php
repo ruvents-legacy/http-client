@@ -9,19 +9,32 @@ namespace Ruvents\HttpClient\Request;
 class File extends \SplFileInfo
 {
     /**
-     * @var string
+     * @var null|string
      */
     private $mimetype;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $name;
 
     /**
-     * @param string $path     Path to the file
-     * @param string $mimetype The MIME type
-     * @param string $name     The name of the file (will replace the name from the $path)
+     * @param resource    $handle
+     * @param null|string $mimetype
+     * @param null|string $name
+     * @return self
+     */
+    public static function getInstanceByResource($handle, $mimetype = null, $name = null)
+    {
+        $path = stream_get_meta_data($handle)['uri'];
+
+        return new self($path, $mimetype, $name);
+    }
+
+    /**
+     * @param string      $path     Path to the file
+     * @param null|string $mimetype The MIME type
+     * @param null|string $name     The name of the file (will replace the name from the $path)
      */
     public function __construct($path, $mimetype = null, $name = null)
     {
@@ -32,7 +45,7 @@ class File extends \SplFileInfo
     }
 
     /**
-     * Returns the CURL representation of the file, based on PHP version
+     * Returns the CURL representation of the file based on PHP version
      * @return \CURLFile|string
      */
     public function getCurl()
@@ -60,7 +73,7 @@ class File extends \SplFileInfo
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getMimetype()
     {
@@ -79,7 +92,7 @@ class File extends \SplFileInfo
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getName()
     {
