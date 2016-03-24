@@ -1,4 +1,4 @@
-# RUVENTS Http Client
+# RUVENTS HTTP Client
 
 ## Installation
 
@@ -6,17 +6,11 @@
 $ composer require ruvents/http-client
 ```
 
-## Usage
+## Creating the request object
 
 ```php
 <?php
-$httpClient = new Ruvents\HttpClient\HttpClient();
-```
 
-### Creating a Request object
-
-```php
-<?php
 $uri = Ruvents\HttpClient\Request\Uri::createHttp(
     // host (required)
     'host.com',
@@ -39,19 +33,19 @@ $request = new Ruvents\HttpClient\Request\Request(
 );
 ```
 
-### Sending the request
+## Sending the request
 
 ```php
 <?php
+
 use Ruvents\HttpClient\HttpClient;
 
 // GET
-$httpClient->get($request);
+HttpClient::get($request);
 
 // POST
-$httpClient->post($request);
+HttpClient::post($request);
 
-// or you can pass the method as the second parameter
-// to HttpClient::send
-$httpClient->send($request, HttpClient::METHOD_GET);
+// any
+HttpClient::send($request, HttpClient::METHOD_GET);
 ```
