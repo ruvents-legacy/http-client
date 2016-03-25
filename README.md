@@ -21,6 +21,7 @@ $uri = Ruvents\HttpClient\Request\Uri::createHttp(
     // use https? (defaults to false)
     true
 );
+
 $request = new Ruvents\HttpClient\Request\Request(
     // uri: string or instance of Uri (required)
     $uri,
@@ -44,7 +45,7 @@ HttpClient::get($request);
 // or
 HttpClient::get(
     'https://host.com/path/to/somewhere?param=value',
-    ['param' => 'value'],
+    ['data_name' => 'data_value'],
     ['header_name' => 'header_value']
 );
 
@@ -52,7 +53,7 @@ HttpClient::post($request);
 // or
 HttpClient::post(
     'https://host.com/path/to/somewhere?param=value',
-    ['param' => 'value'],
+    ['data_name' => 'data_value'],
     ['header_name' => 'header_value'],
     ['file_name' => new Ruvents\HttpClient\Request\File('file.txt')]
 );
