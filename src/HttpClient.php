@@ -2,7 +2,6 @@
 
 namespace Ruvents\HttpClient;
 
-use Ruvents\HttpClient\Exception\InvalidArgumentException;
 use Ruvents\HttpClient\Request\Request;
 use Ruvents\HttpClient\Request\Uri;
 use Ruvents\HttpClient\Response\Response;
@@ -13,40 +12,95 @@ use Ruvents\HttpClient\Response\Response;
  */
 class HttpClient
 {
-    const METHOD_GET = 'get';
-
-    const METHOD_POST = 'post';
-
     /**
-     * @param Request $request
-     * @param string  $method
-     * @throws InvalidArgumentException
+     * @param Request|Uri|string $requestOrUri
+     * @param null|string|array  $queryData
+     * @param string[]           $headers
      * @return Response
      */
-    public static function send(Request $request, $method = self::METHOD_GET)
+    public static function get($requestOrUri, $queryData = null, array $headers = [])
     {
-        if (!in_array($method, self::getSupportedMethods(), true)) {
-            throw new InvalidArgumentException(
-                InvalidArgumentException::haystackMsg(self::getSupportedMethods())
-            );
+        return self::send('GET', $requestOrUri, $queryData, $headers);
+    }
+
+    /**
+     * @param Request|Uri|string $requestOrUri
+     * @param null|string|array  $data
+     * @param string[]           $headers
+     * @param array              $files
+     * @return Response
+     */
+    public static function post($requestOrUri, $data = null, array $headers = [], array $files = [])
+    {
+        return self::send('POST', $requestOrUri, $data, $headers, $files);
+    }
+
+    /**
+     * @param Request|Uri|string $requestOrUri
+     * @param null|string|array  $queryData
+     * @param string[]           $headers
+     * @return Response
+     */
+    public static function delete($requestOrUri, $queryData = null, array $headers = [])
+    {
+        return self::send('DELETE', $requestOrUri, $queryData, $headers);
+    }
+
+    /**
+     * @param Request|Uri|string $requestOrUri
+     * @param null|string|array  $data
+     * @param string[]           $headers
+     * @param array              $files
+     * @return Response
+     */
+    public static function put($requestOrUri, $data = null, array $headers = [], array $files = [])
+    {
+        return self::send('PUT', $requestOrUri, $data, $headers, $files);
+    }
+
+    /**
+     * @param Request|Uri|string $requestOrUri
+     * @param null|string|array  $data
+     * @param string[]           $headers
+     * @param array              $files
+     * @return Response
+     */
+    public static function patch($requestOrUri, $data = null, array $headers = [], array $files = [])
+    {
+        return self::send('PATCH', $requestOrUri, $data, $headers, $files);
+    }
+
+    /**
+     * @param string             $method
+     * @param Request|Uri|string $request
+     * @param null|string|array  $data
+     * @param string[]           $headers
+     * @param array              $files
+     * @return Response
+     */
+    protected static function send($method, $request, $data = null, array $headers = [], array $files = [])
+    {
+        if (!$request instanceof Request) {
+            $request = new Request($request, $data, $headers, $files);
         }
 
         $ch = curl_init();
 
         switch ($method) {
-            case self::METHOD_GET:
-                $request->getUri()->addQueryParams($request->getDataArray());
-                break;
-
-            case self::METHOD_POST:
-                curl_setopt($ch, CURLOPT_POST, true);
+            case 'POST':
+            case 'PUT':
+            case 'PATCH':
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $request->getAllData());
                 break;
+
+            default:
+                $request->getUri()->addQueryParams($request->getDataArray());
         }
 
         $request->addHeader('Expect', '');
 
         curl_setopt_array($ch, [
+            CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_URL => $request->getUri()->buildUri(),
             CURLOPT_HTTPHEADER => $request->getCurlHeaders(),
@@ -59,52 +113,6 @@ class HttpClient
         curl_close($ch);
 
         return $response;
-    }
-
-    /**
-     * @param Request|Uri|string $requestOrUri
-     * @param null|string|array  $data
-     * @param string[]           $headers
-     * @return Response
-     */
-    public static function get($requestOrUri, $data = null, array $headers = [])
-    {
-        if ($requestOrUri instanceof Request) {
-            $request = $requestOrUri;
-        } else {
-            $request = new Request($requestOrUri, $data, $headers);
-        }
-
-        return self::send($request, self::METHOD_GET);
-    }
-
-    /**
-     * @param Request|Uri|string $requestOrUri
-     * @param null|string|array  $data
-     * @param string[]           $headers
-     * @param array              $files
-     * @return Response
-     */
-    public static function post($requestOrUri, $data = null, array $headers = [], array $files = [])
-    {
-        if ($requestOrUri instanceof Request) {
-            $request = $requestOrUri;
-        } else {
-            $request = new Request($requestOrUri, $data, $headers, $files);
-        }
-
-        return self::send($request, self::METHOD_POST);
-    }
-
-    /**
-     * @return array
-     */
-    public static function getSupportedMethods()
-    {
-        return [
-            self::METHOD_GET,
-            self::METHOD_POST,
-        ];
     }
 
     /**
@@ -127,7 +135,7 @@ class HttpClient
      * @param string $raw
      * @return array
      */
-    private static function parseRawHeaders($raw)
+    protected static function parseRawHeaders($raw)
     {
         $headers = [];
 

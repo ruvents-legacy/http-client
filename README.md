@@ -17,19 +17,19 @@ $uri = Ruvents\HttpClient\Request\Uri::createHttp(
     // path (defaults to '')
     'path/to/somewhere',
     // query parameters (defaults to [])
-    ['name' => 'b'],
+    ['param' => 'value'],
     // use https? (defaults to false)
     true
 );
 $request = new Ruvents\HttpClient\Request\Request(
-    // the Uri instance (required)
+    // uri: string or instance of Uri (required)
     $uri,
-    // a scalar or an array (defaults to [])
-    ['name' => 'value'],
-    // an array of headers (defaults to [])
-    ['name' => 'value'],
-    // an array of File instances (defaults to [])
-    ['name' => new Ruvents\HttpClient\Request\File('file.txt')]
+    // data: a scalar or an array (defaults to null)
+    ['data_name' => 'data_value'],
+    // headers: array (defaults to [])
+    ['header_name' => 'header_value'],
+    // files: an array of resources, paths or File instances (defaults to [])
+    ['file_name' => new Ruvents\HttpClient\Request\File('file.txt')]
 );
 ```
 
@@ -40,12 +40,25 @@ $request = new Ruvents\HttpClient\Request\Request(
 
 use Ruvents\HttpClient\HttpClient;
 
-// GET
 HttpClient::get($request);
+// or
+HttpClient::get(
+    'https://host.com/path/to/somewhere?param=value',
+    ['param' => 'value'],
+    ['header_name' => 'header_value']
+);
 
-// POST
 HttpClient::post($request);
+// or
+HttpClient::post(
+    'https://host.com/path/to/somewhere?param=value',
+    ['param' => 'value'],
+    ['header_name' => 'header_value'],
+    ['file_name' => new Ruvents\HttpClient\Request\File('file.txt')]
+);
 
-// any
-HttpClient::send($request, HttpClient::METHOD_GET);
+// other methods
+HttpClient::put($request);
+HttpClient::patch($request);
+HttpClient::delete($request);
 ```
