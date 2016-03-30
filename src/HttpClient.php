@@ -108,7 +108,7 @@ class HttpClient
         ]);
 
         $responseRaw = curl_exec($ch);
-        $response = self::createResponse($ch, $responseRaw);
+        $response = self::createResponse($ch, $responseRaw, $request);
 
         curl_close($ch);
 
@@ -118,9 +118,10 @@ class HttpClient
     /**
      * @param resource $ch
      * @param string   $raw
+     * @param Request  $request
      * @return Response
      */
-    protected static function createResponse($ch, $raw)
+    protected static function createResponse($ch, $raw, $request)
     {
         $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $rawHeaders = substr($raw, 0, $headerSize);
@@ -128,7 +129,7 @@ class HttpClient
         $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $headers = self::parseRawHeaders($rawHeaders);
 
-        return new Response($rawBody, $code, $headers);
+        return new Response($rawBody, $code, $headers, $request);
     }
 
     /**

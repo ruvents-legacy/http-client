@@ -2,6 +2,8 @@
 
 namespace Ruvents\HttpClient\Response;
 
+use Ruvents\HttpClient\Request\Request;
+
 /**
  * Class Response
  */
@@ -23,15 +25,22 @@ class Response
     private $headers = [];
 
     /**
-     * @param string $rawBody
-     * @param int    $code
-     * @param array  $headers
+     * @var null|Request
      */
-    public function __construct($rawBody, $code, array $headers)
+    protected $request;
+
+    /**
+     * @param string       $rawBody
+     * @param int          $code
+     * @param array        $headers
+     * @param null|Request $request
+     */
+    public function __construct($rawBody, $code, array $headers = [], Request $request = null)
     {
         $this->rawBody = $rawBody;
         $this->code = (int)$code;
         $this->headers = $headers;
+        $this->request = $request;
     }
 
     /**
@@ -96,5 +105,13 @@ class Response
         }
 
         return $default;
+    }
+
+    /**
+     * @return null|Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
     }
 }
