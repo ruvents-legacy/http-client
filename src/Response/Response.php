@@ -4,7 +4,6 @@ namespace Ruvents\HttpClient\Response;
 
 /**
  * Class Response
- * @package Ruvents\HttpClient\Response
  */
 class Response
 {

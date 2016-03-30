@@ -7,7 +7,6 @@ use Ruvents\HttpClient\Exception\RuntimeException;
 
 /**
  * Class Request
- * @package Ruvents\HttpClient\Request
  */
 class Request
 {
@@ -27,16 +26,11 @@ class Request
     private $headers = [];
 
     /**
-     * @var File[]
-     */
-    private $files = [];
-
-    /**
      * Request constructor.
      * @param Uri|string        $uri
      * @param null|string|array $data
      * @param string[]          $headers
-     * @param array             $files
+     * @param File[]            $files deprecated 3.0.0
      * @throws InvalidArgumentException
      */
     public function __construct($uri, $data = null, array $headers = [], array $files = [])
@@ -59,11 +53,16 @@ class Request
             );
         }
 
-        $this->headers = $headers;
-
-        foreach ($files as $name => $file) {
-            $this->addFile($name, $file);
+        # TODO: remove in 3.0.0
+        if ($files) {
+            if (is_array($data)) {
+                $this->data = array_replace_recursive($this->data, $files);
+            } elseif (is_null($data)) {
+                $this->data = $files;
+            }
         }
+
+        $this->headers = $headers;
     }
 
     /**
@@ -97,25 +96,6 @@ class Request
     public function getData()
     {
         return $this->data;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDataArray()
-    {
-        switch (true) {
-            case empty($this->data):
-                return [];
-                break;
-
-            case is_array($this->data):
-                return $this->data;
-                break;
-
-            default:
-                return ['data' => $this->data];
-        }
     }
 
     /**
@@ -153,67 +133,42 @@ class Request
     }
 
     /**
-     * @param string                 $name
-     * @param \string|\resource|File $file
-     * @return $this
+     * @return array|null
      */
-    public function addFile($name, $file)
+    public function getPostFields()
+    {
+        if (!is_array($this->data)) {
+            return $this->data;
+        }
+
+        $fields = [];
+        $this->buildPostFields($this->data, '', $fields);
+
+        return $fields;
+    }
+
+    /**
+     * @param mixed  $data
+     * @param string $path
+     * @param array  $fields
+     */
+    protected function buildPostFields($data, $path, array &$fields)
     {
         switch (true) {
-            case is_resource($file):
-                $file = File::getInstanceByResource($file);
+            case is_array($data):
+            case $data instanceof \Traversable:
+                foreach ($data as $key => $value) {
+                    $nextPath = empty($path) ? $key : $path."[$key]";
+                    $this->buildPostFields($value, $nextPath, $fields);
+                }
                 break;
 
-            case is_string($file):
-                $file = new File($file);
-                break;
-
-            case $file instanceof File:
+            case $data instanceof File:
+                $fields[$path] = $data->getCurl();
                 break;
 
             default:
-                throw new InvalidArgumentException(
-                    InvalidArgumentException::typeMsg($file,
-                        'string (path), resource or instance of Ruvents\HttpClient\Request\File')
-                );
-        }
-
-        $this->files[$name] = $file;
-
-        return $this;
-    }
-
-    /**
-     * @return File[]
-     */
-    public function getFiles()
-    {
-        return $this->files;
-    }
-
-    /**
-     * @return string[]|\CURLFile[]
-     */
-    public function getCurlFiles()
-    {
-        $curlFiles = [];
-
-        foreach ($this->files as $name => $file) {
-            $curlFiles[$name] = $file->getCurl();
-        }
-
-        return $curlFiles;
-    }
-
-    /**
-     * @return array
-     */
-    public function getAllData()
-    {
-        if (empty($this->files)) {
-            return $this->data;
-        } else {
-            return array_merge($this->getDataArray(), $this->getCurlFiles());
+                $fields[$path] = $data;
         }
     }
 }

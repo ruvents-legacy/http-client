@@ -4,7 +4,6 @@ namespace Ruvents\HttpClient\Exception;
 
 /**
  * Class InvalidArgumentException
- * @package Ruvents\HttpClient\Exception
  */
 class InvalidArgumentException extends \InvalidArgumentException
 {

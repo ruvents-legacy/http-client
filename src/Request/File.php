@@ -4,7 +4,6 @@ namespace Ruvents\HttpClient\Request;
 
 /**
  * Class File
- * @package Ruvents\HttpClient\Request
  */
 class File extends \SplFileInfo
 {

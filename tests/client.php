@@ -12,11 +12,20 @@ require_once __DIR__.'/../vendor/autoload.php';
 
 $request = new Request(
     Uri::createHttp($_SERVER['HTTP_HOST'], 'tests/server.php', ['a' => 'b']),
-    ['post' => 123],
-    ['header' => 'value'],
-    ['a' => new File(__FILE__, 'text/php', 'a.txt')]
+    [
+        'a' => 'a',
+        'b' => [
+            'b1' => 1,
+            'b2' => [
+                'c' => 2,
+                'f' => new File(__FILE__)
+            ]
+        ]
+    ],
+    ['header' => 'value']
 );
 
-$response = HttpClient::get($request);
+$response = HttpClient::post($request);
 
-var_dump($response->jsonDecode());
+var_dump($response->jsonDecode(true));
+exit;

@@ -4,7 +4,6 @@ namespace Ruvents\HttpClient\Request;
 
 /**
  * Class Uri
- * @package Ruvents\HttpClient\Request
  */
 class Uri
 {
@@ -253,7 +252,7 @@ class Uri
      */
     public function addQueryParams(array $params)
     {
-        $this->query = array_merge($this->query, $params);
+        $this->query = array_replace_recursive($this->query, $params);
 
         return $this;
     }

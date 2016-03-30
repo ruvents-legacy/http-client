@@ -8,7 +8,6 @@ use Ruvents\HttpClient\Response\Response;
 
 /**
  * Class HttpClient
- * @package Ruvents\HttpClient
  */
 class HttpClient
 {
@@ -90,11 +89,12 @@ class HttpClient
             case 'POST':
             case 'PUT':
             case 'PATCH':
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $request->getAllData());
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $request->getPostFields());
                 break;
 
             default:
-                $request->getUri()->addQueryParams($request->getDataArray());
+                $queryData = is_array($request->getData()) ? $request->getData() : [];
+                $request->getUri()->addQueryParams($queryData);
         }
 
         $request->addHeader('Expect', '');
