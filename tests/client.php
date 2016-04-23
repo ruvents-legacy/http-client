@@ -18,14 +18,14 @@ $request = new Request(
             'b1' => 1,
             'b2' => [
                 'c' => 2,
-                'f' => new File(__FILE__)
-            ]
-        ]
+                'f' => new File(__FILE__),
+            ],
+        ],
     ],
     ['header' => 'value']
 );
 
-$response = HttpClient::post($request);
+$response = HttpClient::send('post', $request);
 
 var_dump($response->jsonDecode(true));
 exit;

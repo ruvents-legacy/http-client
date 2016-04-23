@@ -2,6 +2,7 @@
 
 namespace Ruvents\HttpClient;
 
+use Ruvents\HttpClient\Exception\RuntimeException;
 use Ruvents\HttpClient\Request\Request;
 use Ruvents\HttpClient\Request\Uri;
 use Ruvents\HttpClient\Response\Response;
@@ -75,10 +76,13 @@ class HttpClient
      * @param null|string|array  $data
      * @param string[]           $headers
      * @param array              $files
+     * @throws RuntimeException
      * @return Response
      */
-    protected static function send($method, $request, $data = null, array $headers = [], array $files = [])
+    public static function send($method, $request, $data = null, array $headers = [], array $files = [])
     {
+        $method = strtoupper($method);
+
         if (!$request instanceof Request) {
             $request = new Request($request, $data, $headers, $files);
         }
@@ -86,6 +90,12 @@ class HttpClient
         $ch = curl_init();
 
         switch ($method) {
+            case 'GET':
+            case 'DELETE':
+                $queryData = is_array($request->getData()) ? $request->getData() : [];
+                $request->getUri()->addQueryParams($queryData);
+                break;
+
             case 'POST':
             case 'PUT':
             case 'PATCH':
@@ -93,8 +103,10 @@ class HttpClient
                 break;
 
             default:
-                $queryData = is_array($request->getData()) ? $request->getData() : [];
-                $request->getUri()->addQueryParams($queryData);
+                throw new RuntimeException(sprintf(
+                    'Method "%s" is not supported',
+                    $method
+                ));
         }
 
         $request->addHeader('Expect', '');
