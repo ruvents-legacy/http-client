@@ -117,6 +117,7 @@ class HttpClient
             CURLOPT_URL => $request->getUri()->buildUri(),
             CURLOPT_HTTPHEADER => $request->getCurlHeaders(),
             CURLOPT_HEADER => true,
+            CURLOPT_FOLLOWLOCATION => true,
         ]);
 
         $responseRaw = curl_exec($ch);
