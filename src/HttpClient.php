@@ -81,6 +81,10 @@ class HttpClient
      */
     public static function send($method, $request, $data = null, array $headers = [], array $files = [])
     {
+        if (!in_array('curl', get_loaded_extensions())) {
+            throw new RuntimeException('Http Client requires cURL PHP extension.');
+        }
+
         $method = strtoupper($method);
 
         if (!$request instanceof Request) {
