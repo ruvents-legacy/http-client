@@ -1,5 +1,6 @@
 <?php
 
+use Ruvents\HttpClient\Exception\CurlException;
 use Ruvents\HttpClient\HttpClient;
 use Ruvents\HttpClient\Request\File;
 use Ruvents\HttpClient\Request\Request;
@@ -25,7 +26,11 @@ $request = new Request(
     ['header' => 'value']
 );
 
-$response = HttpClient::send('post', $request);
+try {
+    $response = HttpClient::send('post', $request);
+} catch (CurlException $e) {
+    var_dump($e);
+    throw $e;
+}
 
-var_dump($response->jsonDecode(true));
-exit;
+var_dump($response->jsonDecode());

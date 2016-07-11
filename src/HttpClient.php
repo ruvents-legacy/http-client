@@ -2,6 +2,7 @@
 
 namespace Ruvents\HttpClient;
 
+use Ruvents\HttpClient\Exception\CurlException;
 use Ruvents\HttpClient\Exception\RuntimeException;
 use Ruvents\HttpClient\Request\Request;
 use Ruvents\HttpClient\Request\Uri;
@@ -125,6 +126,11 @@ class HttpClient
         ]);
 
         $responseRaw = curl_exec($ch);
+
+        if (false === $responseRaw) {
+            throw new CurlException(curl_error($ch), curl_errno($ch));
+        }
+
         $response = self::createResponse($ch, $responseRaw, $request);
 
         curl_close($ch);

@@ -5,7 +5,7 @@ namespace Ruvents\HttpClient\Exception;
 /**
  * Class InvalidArgumentException
  */
-class InvalidArgumentException extends \InvalidArgumentException
+class InvalidArgumentException extends \InvalidArgumentException implements HttpClientExceptionInterface
 {
     /**
      * @param mixed  $var
