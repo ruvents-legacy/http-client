@@ -23,7 +23,7 @@ class Request
     /**
      * @var string[]
      */
-    private $headers = [];
+    private $headers = array();
 
     /**
      * Request constructor.
@@ -33,7 +33,7 @@ class Request
      * @param File[]            $files deprecated 3.0.0
      * @throws InvalidArgumentException
      */
-    public function __construct($uri, $data = null, array $headers = [], array $files = [])
+    public function __construct($uri, $data = null, array $headers = array(), array $files = array())
     {
         if ($uri instanceof Uri) {
             $this->uri = $uri;
@@ -123,7 +123,7 @@ class Request
      */
     public function getCurlHeaders()
     {
-        $curlHeaders = [];
+        $curlHeaders = array();
 
         foreach ($this->headers as $name => $value) {
             $curlHeaders[] = "$name: $value";
@@ -141,7 +141,7 @@ class Request
             return $this->data;
         }
 
-        $fields = [];
+        $fields = array();
         $this->buildPostFields($this->data, '', $fields);
 
         return $fields;

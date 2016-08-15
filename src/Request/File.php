@@ -25,7 +25,8 @@ class File extends \SplFileInfo
      */
     public static function getInstanceByResource($handle, $mimetype = null, $name = null)
     {
-        $path = stream_get_meta_data($handle)['uri'];
+        $streamMeta = stream_get_meta_data($handle);
+        $path = $streamMeta['uri'];
 
         return new self($path, $mimetype, $name);
     }

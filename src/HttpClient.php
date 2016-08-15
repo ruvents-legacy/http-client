@@ -19,7 +19,7 @@ class HttpClient
      * @param string[]           $headers
      * @return Response
      */
-    public static function get($requestOrUri, $queryData = null, array $headers = [])
+    public static function get($requestOrUri, $queryData = null, array $headers = array())
     {
         return self::send('GET', $requestOrUri, $queryData, $headers);
     }
@@ -31,7 +31,7 @@ class HttpClient
      * @param array              $files
      * @return Response
      */
-    public static function post($requestOrUri, $data = null, array $headers = [], array $files = [])
+    public static function post($requestOrUri, $data = null, array $headers = array(), array $files = array())
     {
         return self::send('POST', $requestOrUri, $data, $headers, $files);
     }
@@ -42,7 +42,7 @@ class HttpClient
      * @param string[]           $headers
      * @return Response
      */
-    public static function delete($requestOrUri, $queryData = null, array $headers = [])
+    public static function delete($requestOrUri, $queryData = null, array $headers = array())
     {
         return self::send('DELETE', $requestOrUri, $queryData, $headers);
     }
@@ -54,7 +54,7 @@ class HttpClient
      * @param array              $files
      * @return Response
      */
-    public static function put($requestOrUri, $data = null, array $headers = [], array $files = [])
+    public static function put($requestOrUri, $data = null, array $headers = array(), array $files = array())
     {
         return self::send('PUT', $requestOrUri, $data, $headers, $files);
     }
@@ -66,7 +66,7 @@ class HttpClient
      * @param array              $files
      * @return Response
      */
-    public static function patch($requestOrUri, $data = null, array $headers = [], array $files = [])
+    public static function patch($requestOrUri, $data = null, array $headers = array(), array $files = array())
     {
         return self::send('PATCH', $requestOrUri, $data, $headers, $files);
     }
@@ -77,10 +77,10 @@ class HttpClient
      * @param null|string|array  $data
      * @param string[]           $headers
      * @param array              $files
-     * @throws RuntimeException
+     * @throws RuntimeException|CurlException
      * @return Response
      */
-    public static function send($method, $request, $data = null, array $headers = [], array $files = [])
+    public static function send($method, $request, $data = null, array $headers = array(), array $files = array())
     {
         if (!in_array('curl', get_loaded_extensions())) {
             throw new RuntimeException('Http Client requires cURL PHP extension.');
@@ -97,7 +97,7 @@ class HttpClient
         switch ($method) {
             case 'GET':
             case 'DELETE':
-                $queryData = is_array($request->getData()) ? $request->getData() : [];
+                $queryData = is_array($request->getData()) ? $request->getData() : array();
                 $request->getUri()->addQueryParams($queryData);
                 break;
 
@@ -116,14 +116,14 @@ class HttpClient
 
         $request->addHeader('Expect', '');
 
-        curl_setopt_array($ch, [
+        curl_setopt_array($ch, array(
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_URL => $request->getUri()->buildUri(),
             CURLOPT_HTTPHEADER => $request->getCurlHeaders(),
             CURLOPT_HEADER => true,
             CURLOPT_FOLLOWLOCATION => true,
-        ]);
+        ));
 
         $responseRaw = curl_exec($ch);
 
@@ -161,7 +161,7 @@ class HttpClient
      */
     protected static function parseRawHeaders($raw)
     {
-        $headers = [];
+        $headers = array();
 
         foreach (explode("\r\n", $raw) as $line) {
             if (false !== strpos($line, ':')) {

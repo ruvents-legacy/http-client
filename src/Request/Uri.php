@@ -40,7 +40,7 @@ class Uri
     /**
      * @var array
      */
-    private $query = [];
+    private $query = array();
 
     /**
      * @var string
@@ -54,7 +54,7 @@ class Uri
      * @param bool         $secure
      * @return self
      */
-    public static function createHttp($host, $path = '', $query = [], $secure = false)
+    public static function createHttp($host, $path = '', $query = array(), $secure = false)
     {
         $scheme = 'http'.($secure ? 's' : '');
 
@@ -120,7 +120,7 @@ class Uri
      */
     public function buildUri()
     {
-        return http_build_url([
+        return http_build_url(array(
             'scheme' => $this->scheme,
             'user' => $this->user,
             'pass' => $this->pass,
@@ -129,7 +129,7 @@ class Uri
             'path' => $this->path,
             'query' => $this->getQueryString(),
             'fragment' => $this->fragment,
-        ]);
+        ));
     }
 
     /**

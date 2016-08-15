@@ -22,7 +22,7 @@ class Response
     /**
      * @var array
      */
-    private $headers = [];
+    private $headers = array();
 
     /**
      * @var null|Request
@@ -35,7 +35,7 @@ class Response
      * @param array        $headers
      * @param null|Request $request
      */
-    public function __construct($rawBody, $code, array $headers = [], Request $request = null)
+    public function __construct($rawBody, $code, array $headers = array(), Request $request = null)
     {
         $this->rawBody = $rawBody;
         $this->code = (int)$code;
